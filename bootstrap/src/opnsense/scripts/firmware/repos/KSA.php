@@ -29,14 +29,26 @@
 
 /*
  * The OPNsense firmware runs this whenever it rewrites the repository
- * configuration. It turns the packaged sample into the live KSA.conf,
- * following the pattern of the official os-sunnyvalley vendor plugin.
+ * configuration, and the package runs it after install. It turns the
+ * packaged sample into the live KSA.conf, following the pattern of the
+ * official os-sunnyvalley vendor plugin.
+ *
+ * The KSA-devel repository (development builds) is off by default so
+ * production firewalls only see releases. Creating the marker file below
+ * opts in; doing it here means the choice survives firmware rewrites.
  */
 
 $conf = '/usr/local/etc/pkg/repos/KSA.conf';
+$devel = '/usr/local/etc/pkg/KSA-devel.enable';
 
 if (!file_exists($conf . '.sample')) {
     exit(0);
 }
 
-file_put_contents($conf, file_get_contents($conf . '.sample'));
+$contents = file_get_contents($conf . '.sample');
+
+if (file_exists($devel)) {
+    $contents = preg_replace('/(KSA-devel:\s*\{.*?enabled:\s*)no\b/s', '${1}yes', $contents);
+}
+
+file_put_contents($conf, $contents);

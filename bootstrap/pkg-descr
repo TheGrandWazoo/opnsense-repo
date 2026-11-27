@@ -5,7 +5,9 @@ System > Firmware > Plugins and update with normal firmware updates.
 It adds two package repositories:
 
 * KSA:       released plugins (os-sbc), one track per major version
-* KSA-devel: development builds (os-sbc-devel) from the plugins' next branch
+* KSA-devel: development builds from the plugins' next branch, off by
+             default; create /usr/local/etc/pkg/KSA-devel.enable and
+             reinstall this package to opt in
 
 Both are signed; the fingerprint is installed with this package.
 Plugins provided: os-sbc, a SIP Session Border Controller

@@ -17,8 +17,24 @@ From a shell on the firewall (console option 8, or SSH):
 pkg add https://thegrandwazoo.github.io/opnsense-repo/os-ksa-repo.pkg
 ```
 
-Then open **System > Firmware > Plugins**, click **Check for updates**, and
-install the plugin you want (for example `os-sbc-devel`).
+Then open **System > Firmware > Plugins**, find `os-ksa-repo` (shown as
+*misconfigured*: `pkg add` does not tell OPNsense it was chosen) and click
+**reinstall**. That registers it and records its repository. Then click
+**Check for updates** and install the plugin you want.
+
+### Development builds (opt-in)
+
+The `KSA-devel` repository is off by default, so production firewalls only
+ever see releases. To test development builds:
+
+```sh
+touch /usr/local/etc/pkg/KSA-devel.enable
+```
+
+and reinstall `os-ksa-repo` from the plugin page so the change is applied.
+Delete the file and reinstall again to leave. Development builds use the
+same plugin name as releases (`os-sbc`) and a higher revision, so a firewall
+on the devel track always gets the newest build.
 
 `os-ksa-repo` follows the pattern of OPNsense's official vendor plugins
 (`os-sunnyvalley`): it installs the repository configuration and the
@@ -45,7 +61,7 @@ firewall.
 
 | Track | Repo name on the firewall | Contents | Enabled by `os-ksa-repo` |
 |---|---|---|---|
-| `devel` | `KSA-devel` | Latest build of each plugin's `next` branch (`os-sbc-devel`) | yes |
+| `devel` | `KSA-devel` | Latest build of each plugin's `next` branch (`os-sbc`) | no (opt in, see above) |
 | `v1/testing` | — | Release candidates and releases of major version 1 | no (opt in by hand) |
 | `v1/stable` | `KSA` | Releases of major version 1 (`os-sbc`) | yes |
 
