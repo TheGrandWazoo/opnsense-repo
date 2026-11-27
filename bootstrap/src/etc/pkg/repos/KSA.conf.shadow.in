@@ -1,0 +1,14 @@
+KSA: {
+  fingerprints: "/usr/local/etc/pkg/fingerprints/KSA",
+  url: "https://thegrandwazoo.github.io/opnsense-repo/${ABI}/%%PLUGIN_ABI%%/v1/stable",
+  signature_type: "fingerprints",
+  priority: 5,
+  enabled: yes
+}
+KSA-devel: {
+  fingerprints: "/usr/local/etc/pkg/fingerprints/KSA",
+  url: "https://thegrandwazoo.github.io/opnsense-repo/${ABI}/%%PLUGIN_ABI%%/devel",
+  signature_type: "fingerprints",
+  priority: 5,
+  enabled: yes
+}

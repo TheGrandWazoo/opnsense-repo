@@ -1,0 +1,90 @@
+# Rebuild, sign and publish the package repository to GitHub Pages.
+#
+# Stateless: every run rebuilds the site from the plugin repositories'
+# GitHub releases (sources.toml) and publishes only if something changed.
+# The signing key lives only in the `publish` environment, which only the
+# main branch can use.
+
+name: publish
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17,47 * * * *"   # every 30 minutes; plugin repos cannot trigger us without a token
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Publish even if nothing changed
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  OPNSENSE_SERIES: "26.7"
+  FREEBSD_RELEASE: "15.1"
+  SITE_URL: https://thegrandwazoo.github.io/opnsense-repo
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: publish
+    permissions:
+      contents: write   # push gh-pages
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Fetch the published state
+        run: curl -fsSL "${SITE_URL}/state.json" -o "$RUNNER_TEMP/published-state.json" || echo "nothing published yet"
+
+      - name: Collect packages from plugin releases
+        id: fetch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          FORCE: ${{ github.event_name == 'push' || inputs.force }}
+        run: |
+          args=(--site site --published-state "$RUNNER_TEMP/published-state.json")
+          [ "$FORCE" = "true" ] && args+=(--force)
+          python3 scripts/fetch_sources.py "${args[@]}"
+
+      - name: Build bootstrap, sign and verify (FreeBSD)
+        if: steps.fetch.outputs.changed == 'true'
+        uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
+        env:
+          # The repo variable KSA_SIGNING_SECRET picks the key during a rotation (README).
+          KSA_SIGNING_KEY: ${{ secrets[vars.KSA_SIGNING_SECRET || 'KSA_SIGNING_KEY'] }}
+        with:
+          release: ${{ env.FREEBSD_RELEASE }}
+          envs: OPNSENSE_SERIES KSA_SIGNING_KEY
+          usesh: true
+          prepare: pkg install -y git
+          run: sh scripts/sign-and-index.sh
+
+      - name: Write index page
+        if: steps.fetch.outputs.changed == 'true'
+        run: python3 scripts/make_index.py site
+
+      - name: Push to gh-pages
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "publish $(date -u +%Y-%m-%dT%H:%MZ) from ${GITHUB_SHA::7}"
+          # One commit, force-pushed: Pages serves the current tree; binary history would only bloat the repo.
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+          git log --oneline -1

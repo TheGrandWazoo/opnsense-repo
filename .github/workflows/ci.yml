@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  RUFF_VERSION: "0.17.6"
+  ACTIONLINT_VERSION: "1.7.12"
+  ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.5"
+          coverage: none
+      - name: Tools
+        run: |
+          sudo apt-get install -y -qq shellcheck
+          cd "$RUNNER_TEMP"
+          curl -fsSLo actionlint.tgz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  actionlint.tgz" | sha256sum -c -
+          tar -xzf actionlint.tgz actionlint
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Shell
+        run: shellcheck --severity=warning scripts/*.sh
+      - name: Python
+        run: uvx "ruff@${RUFF_VERSION}" check .
+      - name: PHP
+        run: php -l bootstrap/src/opnsense/scripts/firmware/repos/KSA.php
+      - name: Workflows
+        run: actionlint
+      - name: Execute bits
+        run: |
+          for f in scripts/*.sh scripts/*.py bootstrap/src/opnsense/scripts/firmware/repos/*; do
+            [ "$(git ls-files -s "$f" | cut -c1-6)" = "100755" ] || { echo "$f must be executable (git update-index --chmod=+x)"; exit 1; }
+          done
+      - name: Signing key present
+        run: |
+          ls bootstrap/src/etc/pkg/fingerprints/KSA/trusted/* > /dev/null 2>&1 || { echo "no trusted fingerprint; run scripts/setup-signing-key.sh"; exit 1; }

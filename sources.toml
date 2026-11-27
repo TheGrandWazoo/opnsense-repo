@@ -1,0 +1,21 @@
+# Plugin repositories that publish packages into this repository.
+#
+# Each source is a public GitHub repository whose releases carry .pkg files
+# plus a manifest.json describing them:
+#
+#   {"series": "26.7", "abi": "FreeBSD:15:amd64",
+#    "packages": ["os-sbc-devel-1.0.0_57.pkg"]}
+#
+# Releases map to tracks by tag (scripts/fetch_sources.py):
+#
+#   devel           -> devel          (rolling development build of `next`)
+#   vN.M.P-rc.K     -> vN/testing     (latest release candidate of major N)
+#   vN.M.P          -> vN/stable and vN/testing (latest release of major N)
+#   deps            -> every track    (shared dependencies, e.g. kamailio)
+#
+# Tracks that always exist, even when empty, so that `pkg update` never
+# fails on a firewall with the KSA repositories enabled:
+tracks = ["devel", "v1/testing", "v1/stable"]
+
+[[source]]
+repo = "TheGrandWazoo/os-SBC"

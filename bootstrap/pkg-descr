@@ -1,0 +1,12 @@
+This is the vendor repository package for KSA Technologies plugins.
+Install it once, then the plugins it provides appear under
+System > Firmware > Plugins and update with normal firmware updates.
+
+It adds two package repositories:
+
+* KSA:       released plugins (os-sbc), one track per major version
+* KSA-devel: development builds (os-sbc-devel) from the plugins' next branch
+
+Both are signed; the fingerprint is installed with this package.
+Plugins provided: os-sbc, a SIP Session Border Controller
+(Kamailio and rtpproxy), with its Kamailio and rtpproxy packages.
