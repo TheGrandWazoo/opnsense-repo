@@ -30,6 +30,27 @@ grep -rqs "${EXPECTED_FP}" "${ROOT}/bootstrap/src/etc/pkg/fingerprints/KSA/trust
     echo "signing key's fingerprint ${EXPECTED_FP} is not in bootstrap trusted/"; exit 1; }
 echo "signing key OK, fingerprint ${EXPECTED_FP}"
 
+# Fingerprint-verified repositories (signature_type: "fingerprints", as used
+# by OPNsense and FreeBSD) need the signature and the public key inside the
+# catalogue, which pkg only writes when signing through a signing_command.
+# This is the signing script from pkg-repo(8).
+PUB="$(mktemp /tmp/ksa.pub.XXXXXX)"
+SIGN="$(mktemp /tmp/ksa.sign.XXXXXX)"
+trap 'rm -f "${KEY}" "${PUB}" "${SIGN}"' EXIT
+openssl pkey -in "${KEY}" -pubout -out "${PUB}" 2>/dev/null
+cat > "${SIGN}" <<SCRIPT
+#!/bin/sh
+read -t 2 sum
+[ -z "\$sum" ] && exit 1
+echo SIGNATURE
+echo -n "\$sum" | /usr/bin/openssl dgst -sign "${KEY}" -sha256 -binary
+echo
+echo CERT
+cat "${PUB}"
+echo END
+SCRIPT
+chmod 700 "${SIGN}"
+
 echo ">>> Building os-ksa-repo with opnsense/plugins stable/${SERIES}"
 rm -rf "${WORK}"
 mkdir -p "${WORK}"
@@ -49,7 +70,7 @@ echo ">>> Signing tracks"
 for ALL in $(find "${SITE}" -type d -name All | sort); do
     TRACK="$(dirname "${ALL}")"
     cp "${BOOT}" "${ALL}/"
-    pkg repo "${TRACK}" "${KEY}"
+    pkg repo "${TRACK}" signing_command: "${SIGN}"
     echo "signed ${TRACK#"${SITE}"/} ($(find "${ALL}" -name '*.pkg' | wc -l | tr -d ' ') packages):" \
         "$(find "${TRACK}" -maxdepth 1 -type f -exec basename {} \; | sort | tr '\n' ' ')"
     echo "  packagesite.pkg holds: $(tar -tf "${TRACK}/packagesite.pkg" 2>/dev/null | tr '\n' ' ')"
