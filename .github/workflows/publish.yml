@@ -57,18 +57,30 @@ jobs:
           [ "$FORCE" = "true" ] && args+=(--force)
           python3 scripts/fetch_sources.py "${args[@]}"
 
+      - name: Encode the signing key for the VM
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          # The repo variable KSA_SIGNING_SECRET picks the key during a rotation (README).
+          KEY: ${{ secrets[vars.KSA_SIGNING_SECRET || 'KSA_SIGNING_KEY'] }}
+        run: |
+          [ -n "$KEY" ] || { echo "signing key secret is empty"; exit 1; }
+          b64="$(printf '%s\n' "$KEY" | base64 -w0)"
+          echo "::add-mask::$b64"
+          echo "KSA_SIGNING_KEY_B64=$b64" >> "$GITHUB_ENV"
+
       - name: Build bootstrap, sign and verify (FreeBSD)
         if: steps.fetch.outputs.changed == 'true'
         uses: vmactions/freebsd-vm@811efaaac0668df8bfb8308c3ec997b5ab50037b # v1.6.0
-        env:
-          # The repo variable KSA_SIGNING_SECRET picks the key during a rotation (README).
-          KSA_SIGNING_KEY: ${{ secrets[vars.KSA_SIGNING_SECRET || 'KSA_SIGNING_KEY'] }}
         with:
           release: ${{ env.FREEBSD_RELEASE }}
-          envs: OPNSENSE_SERIES KSA_SIGNING_KEY
+          envs: OPNSENSE_SERIES KSA_SIGNING_KEY_B64
           usesh: true
-          prepare: pkg install -y git
+          prepare: pkg install -y git php85 python313
           run: sh scripts/sign-and-index.sh
+
+      - name: Clear the encoded key from the job environment
+        if: always()
+        run: echo "KSA_SIGNING_KEY_B64=" >> "$GITHUB_ENV"
 
       - name: Write index page
         if: steps.fetch.outputs.changed == 'true'

@@ -6,7 +6,9 @@
 # workflow's VM) from the repository root, after scripts/fetch_sources.py.
 #
 #   OPNSENSE_SERIES  opnsense/plugins branch used to build the bootstrap (default 26.7)
-#   KSA_SIGNING_KEY  PEM private key (the `publish` environment secret)
+#   KSA_SIGNING_KEY_B64  PEM private key, base64 on one line (the workflow
+#                        encodes the `publish` environment secret; multi-line
+#                        values do not survive the trip into the VM intact)
 
 set -eu
 
@@ -17,10 +19,16 @@ WORK="${ROOT}/work"
 KEY="$(mktemp /tmp/ksa.key.XXXXXX)"
 trap 'rm -f "${KEY}"' EXIT
 
-: "${KSA_SIGNING_KEY:?KSA_SIGNING_KEY is not set}"
+: "${KSA_SIGNING_KEY_B64:?KSA_SIGNING_KEY_B64 is not set}"
 umask 077
-printf '%s\n' "${KSA_SIGNING_KEY}" > "${KEY}"
+printf '%s' "${KSA_SIGNING_KEY_B64}" | openssl base64 -d -A > "${KEY}"
 umask 022
+# Fail early, without printing anything secret, if the key did not arrive intact.
+openssl pkey -in "${KEY}" -noout 2>/dev/null || { echo "signing key is not a valid private key"; exit 1; }
+EXPECTED_FP="$(openssl pkey -in "${KEY}" -pubout 2>/dev/null | openssl dgst -sha256 -r | cut -d' ' -f1)"
+grep -rqs "${EXPECTED_FP}" "${ROOT}/bootstrap/src/etc/pkg/fingerprints/KSA/trusted" || {
+    echo "signing key's fingerprint ${EXPECTED_FP} is not in bootstrap trusted/"; exit 1; }
+echo "signing key OK, fingerprint ${EXPECTED_FP}"
 
 echo ">>> Building os-ksa-repo with opnsense/plugins stable/${SERIES}"
 rm -rf "${WORK}"
@@ -41,8 +49,10 @@ echo ">>> Signing tracks"
 for ALL in $(find "${SITE}" -type d -name All | sort); do
     TRACK="$(dirname "${ALL}")"
     cp "${BOOT}" "${ALL}/"
-    pkg repo -q "${TRACK}" "${KEY}"
-    echo "signed ${TRACK#"${SITE}"/} ($(find "${ALL}" -name '*.pkg' | wc -l | tr -d ' ') packages)"
+    pkg repo "${TRACK}" "${KEY}"
+    echo "signed ${TRACK#"${SITE}"/} ($(find "${ALL}" -name '*.pkg' | wc -l | tr -d ' ') packages):" \
+        "$(find "${TRACK}" -maxdepth 1 -type f -exec basename {} \; | sort | tr '\n' ' ')"
+    echo "  packagesite.pkg holds: $(tar -tf "${TRACK}/packagesite.pkg" 2>/dev/null | tr '\n' ' ')"
 done
 
 echo ">>> Verifying every track against the bootstrap fingerprint"
@@ -63,7 +73,16 @@ KSA-verify: {
   enabled: yes
 }
 EOF
-    pkg -o REPOS_DIR="${TEST}/repos" -o PKG_DBDIR="${TEST}/db" -o ABI="$(echo "${TRACK#"${SITE}"/}" | cut -d/ -f1)" update -f -q
+    # pkg update can exit 0 even when it rejects a repository, so check the
+    # messages and that the catalogue really lists the bootstrap package.
+    rm -rf "${TEST}/db" && mkdir -p "${TEST}/db"
+    OUT="$(pkg -o REPOS_DIR="${TEST}/repos" -o PKG_DBDIR="${TEST}/db" update -f 2>&1 || true)"
+    printf '%s\n' "${OUT}"
+    if printf '%s' "${OUT}" | grep -qiE 'no signature|signature.*(fail|invalid|mismatch)|untrusted|not trusted'; then
+        echo "FAILED: ${TRACK#"${SITE}"/} signature not accepted"; exit 1
+    fi
+    FOUND="$(pkg -o REPOS_DIR="${TEST}/repos" -o PKG_DBDIR="${TEST}/db" rquery -r KSA-verify '%n' 2>/dev/null | grep -c '^os-ksa-repo$' || true)"
+    [ "${FOUND}" = "1" ] || { echo "FAILED: ${TRACK#"${SITE}"/} catalogue does not list os-ksa-repo"; exit 1; }
     echo "verified ${TRACK#"${SITE}"/}"
 done
 rm -rf "${TEST}"
