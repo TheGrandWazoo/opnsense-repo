@@ -10,5 +10,5 @@ KSA-devel: {
   url: "https://thegrandwazoo.github.io/opnsense-repo/${ABI}/%%PLUGIN_ABI%%/devel",
   signature_type: "fingerprints",
   priority: 5,
-  enabled: yes
+  enabled: no
 }
