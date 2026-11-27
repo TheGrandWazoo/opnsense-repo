@@ -1,0 +1,230 @@
+{
+  "selected": [
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "bcg729-1.1.2.pkg",
+      "asset_id": 801421164,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "gsm-1.0.24.pkg",
+      "asset_id": 801421169,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "kamailio-6.1.3.pkg",
+      "asset_id": 801421163,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libg722-1.2.8.pkg",
+      "asset_id": 801421162,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsndfile-1.2.2.20251216.pkg",
+      "asset_id": 801421165,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsrtp2-2.8.1.pkg",
+      "asset_id": 801421220,
+      "updated_at": "2026-11-27T17:34:06Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "devel",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "os-sbc-devel-1.0.0_15.pkg",
+      "asset_id": 801381276,
+      "updated_at": "2026-11-27T17:20:54Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "devel",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "rtpproxy-3.1.1.pkg",
+      "asset_id": 801421239,
+      "updated_at": "2026-11-27T17:34:06Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "bcg729-1.1.2.pkg",
+      "asset_id": 801421164,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "gsm-1.0.24.pkg",
+      "asset_id": 801421169,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "kamailio-6.1.3.pkg",
+      "asset_id": 801421163,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libg722-1.2.8.pkg",
+      "asset_id": 801421162,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsndfile-1.2.2.20251216.pkg",
+      "asset_id": 801421165,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsrtp2-2.8.1.pkg",
+      "asset_id": 801421220,
+      "updated_at": "2026-11-27T17:34:06Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/stable",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "rtpproxy-3.1.1.pkg",
+      "asset_id": 801421239,
+      "updated_at": "2026-11-27T17:34:06Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "bcg729-1.1.2.pkg",
+      "asset_id": 801421164,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "gsm-1.0.24.pkg",
+      "asset_id": 801421169,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "kamailio-6.1.3.pkg",
+      "asset_id": 801421163,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libg722-1.2.8.pkg",
+      "asset_id": 801421162,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsndfile-1.2.2.20251216.pkg",
+      "asset_id": 801421165,
+      "updated_at": "2026-11-27T17:34:05Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "libsrtp2-2.8.1.pkg",
+      "asset_id": 801421220,
+      "updated_at": "2026-11-27T17:34:06Z"
+    },
+    {
+      "repo": "TheGrandWazoo/os-SBC",
+      "tag": "deps",
+      "track": "v1/testing",
+      "abi": "FreeBSD:15:amd64",
+      "series": "26.7",
+      "package": "rtpproxy-3.1.1.pkg",
+      "asset_id": 801421239,
+      "updated_at": "2026-11-27T17:34:06Z"
+    }
+  ],
+  "bootstrap_sha256": "a4d1e48588c094ae1443a57c2a79adaebd8cd50997f6e05d86475028a26823eb",
+  "tracks": [
+    "devel",
+    "v1/testing",
+    "v1/stable"
+  ]
+}
